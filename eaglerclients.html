@@ -1,0 +1,91 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaglerClients</title>
+    <link rel="stylesheet" href="ec.css">
+     <link rel="shortcut icon" href="sword.png" type="image/x-icon"> 
+    <style>
+        .clients-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .client-box {
+            
+            width: 250px; 
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-button">
+        <a href="index.html">&larr; Back</a>
+    </div>
+
+    <div class="clients-container">
+        <div class="client-box">
+            <h2>Resent</h2>
+            <p>Resent Client.</p>
+            <a href="resent.html" class="client-link">Select</a>
+        </div>
+        <div class="client-box">
+            <h2>Client 2</h2>
+            <p>EaglercraftX Client.</p>
+            <a href="eaglercraftx.html" class="client-link">Select</a>
+        </div>
+        <div class="client-box">
+            <h2>Client 3</h2>
+            <p>Eaglerforge</p>
+            <a href="eaglerforge.html" class="client-link">Select</a>
+        </div>
+        <div class="client-box">
+            <h2>Client 4</h2>
+            <p>more coming soon</p>
+            <a href="#" class="client-link">Select</a>
+        </div>
+        <div class="client-box">
+            <h2>Client 5</h2>
+            <p>more coming soon</p>
+            <a href="#" class="client-link">Select</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.querySelector('.clients-container');
+            let scrollAmount = 0;
+            let isScrolling = false;
+
+            const scrollSpeed = 0.1go; // Base speed multiplier
+            const deceleration = 0.95; // Deceleration factor, closer to 1 is slower
+            const minSpeed = 0.1; // Minimum speed to stop scrolling
+
+            // Scroll horizontally with mouse wheel
+            container.addEventListener('wheel', function (e) {
+                e.preventDefault();
+                scrollAmount += e.deltaY * scrollSpeed;
+                if (!isScrolling) {
+                    isScrolling = true;
+                    requestAnimationFrame(smoothScroll);
+                }
+            });
+
+            function smoothScroll() {
+                if (Math.abs(scrollAmount) > minSpeed) {
+                    container.scrollLeft += scrollAmount;
+                    scrollAmount *= deceleration;
+                    requestAnimationFrame(smoothScroll);
+                } else {
+                    isScrolling = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

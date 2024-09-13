@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadowknight Discord</title>
+     <link rel="shortcut icon" href="sword.png" type="image/x-icon"> 
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-image: url("4.gif"); /* Background image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: transparent; 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            margin-bottom: 50px; /* Space between header and button */
+        }
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        .discord-button {
+            background-color: #007bff; /* Blue background */
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50%; /* Round button */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1.5rem;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .discord-button:hover {
+            background-color: #0069d9; /* Darker blue on hover */
+        }
+
+        footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Click the button to copy discord link bro</h1>
+    </header>
+
+    <button class="discord-button" onclick="copyDiscordLink()">Join the Discord </button>
+
+    <footer>
+        Test
+    </footer>
+
+    <script>
+        function copyDiscordLink() {
+            navigator.clipboard.writeText("https://discord.gg/YOUR_DISCORD_INVITE_LINK") 
+                .then(() => {
+                    console.log("Discord link copied to clipboard!");
+                    
+                })
+                .catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+        }
+    </script>
+</body>
+</html>

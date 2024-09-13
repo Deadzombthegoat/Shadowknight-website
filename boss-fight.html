@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Boss Fight Game</title>
+    <style>
+        body, html {
+            margin: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #playerHealthBar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 200px;
+            height: 20px;
+            background: #555;
+            border: 2px solid #000;
+        }
+        #playerHealth {
+            height: 100%;
+            background: #0f0;
+        }
+        #bossHealthBar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 200px;
+            height: 20px;
+            background: #555;
+            border: 2px solid #000;
+        }
+        #bossHealth {
+            height: 100%;
+            background: #f00;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="playerHealthBar">
+        <div id="playerHealth"></div>
+    </div>
+    <div id="bossHealthBar">
+        <div id="bossHealth"></div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const keys = {};
+        const player = {
+            x: 0,
+            y: 0,
+            size: 30,
+            speed: 5,
+            color: 'green',
+            bullets: [],
+            health: 100
+        };
+        const boss = {
+            x: 0,
+            y: 0,
+            size: 60,
+            color: 'red',
+            bullets: [],
+            health: 100,
+            shootInterval: 1000,
+            lastShotTime: 0
+        };
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function drawTriangle(x, y, size, angle, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + size * Math.cos(angle), y - size * Math.sin(angle));
+            ctx.lineTo(x + size * Math.cos(angle + 2 * Math.PI / 3), y - size * Math.sin(angle + 2 * Math.PI / 3));
+            ctx.lineTo(x + size * Math.cos(angle - 2 * Math.PI / 3), y - size * Math.sin(angle - 2 * Math.PI / 3));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw player
+            const angle = Math.atan2(mouseY - player.y, mouseX - player.x) + Math.PI; // Inverted direction
+            drawTriangle(player.x, player.y, player.size, angle, player.color);
+
+            // Draw boss
+            drawTriangle(boss.x, boss.y, boss.size, Math.PI / 2, boss.color);
+
+            // Draw player bullets
+            for (const bullet of player.bullets) {
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(bullet.x, bullet.y, 5, 5);
+            }
+
+            // Draw boss bullets
+            for (const bullet of boss.bullets) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(bullet.x, bullet.y, 5, 5);
+            }
+
+            // Draw health bars
+            const playerHealthWidth = (player.health / 100) * 200;
+            document.getElementById('playerHealth').style.width = `${playerHealthWidth}px`;
+
+            const bossHealthWidth = (boss.health / 100) * 200;
+            document.getElementById('bossHealth').style.width = `${bossHealthWidth}px`;
+        }
+
+        function update() {
+            // Player movement
+            const angle = Math.atan2(mouseY - player.y, mouseX - player.x) + Math.PI; // Inverted direction
+            if (keys['w']) player.y -= player.speed;
+            if (keys['s']) player.y += player.speed;
+            if (keys['a']) player.x -= player.speed;
+            if (keys['d']) player.x += player.speed;
+
+            // Update player bullets
+            player.bullets.forEach(bullet => {
+                bullet.x += bullet.vx;
+                bullet.y += bullet.vy;
+            });
+            player.bullets = player.bullets.filter(b => b.x > 0 && b.x < canvas.width && b.y > 0 && b.y < canvas.height);
+
+            // Update boss bullets
+            boss.bullets.forEach(bullet => {
+                bullet.x += bullet.vx;
+                bullet.y += bullet.vy;
+            });
+            boss.bullets = boss.bullets.filter(b => b.x > 0 && b.x < canvas.width && b.y > 0 && b.y < canvas.height);
+
+            // Boss shooting
+            const now = Date.now();
+            if (now - boss.lastShotTime > boss.shootInterval) {
+                boss.lastShotTime = now;
+                const angleToPlayer = Math.atan2(player.y - boss.y, player.x - boss.x);
+                boss.bullets.push({
+                    x: boss.x,
+                    y: boss.y,
+                    vx: Math.cos(angleToPlayer) * 5,
+                    vy: Math.sin(angleToPlayer) * 5
+                });
+            }
+
+            // Check collisions
+            player.bullets.forEach(b => {
+                if (Math.hypot(b.x - boss.x, b.y - boss.y) < (player.size + boss.size) / 2) {
+                    console.log('Boss hit!');
+                    boss.health -= 10;
+                    player.bullets = player.bullets.filter(bullet => bullet !== b);
+                    if (boss.health <= 0) {
+                        window.location.href = 'index.html'; // Replace with your winning URL
+                    }
+                }
+            });
+
+            boss.bullets.forEach(b => {
+                if (Math.hypot(b.x - player.x, b.y - player.y) < (player.size + 5) / 2) {
+                    console.log('Player hit!');
+                    player.health -= 10;
+                    boss.bullets = boss.bullets.filter(bullet => bullet !== b);
+                    if (player.health <= 0) {
+                        alert('Game Over');
+                        window.location.href = 'index.html'
+                    }
+                }
+            });
+        }
+
+        function shoot() {
+            const angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+            player.bullets.push({
+                x: player.x + Math.cos(angle) * player.size / 2,
+                y: player.y + Math.sin(angle) * player.size / 2,
+                vx: Math.cos(angle) * 10,
+                vy: Math.sin(angle) * 10
+            });
+        }
+
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('click', () => {
+            shoot();
+        });
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Set player and boss positions
+        player.x = canvas.width / 2;
+        player.y = canvas.height - 100;
+        boss.x = canvas.width / 2;
+        boss.y = 100;
+
+        gameLoop();
+    </script>
+</body>
+</html>

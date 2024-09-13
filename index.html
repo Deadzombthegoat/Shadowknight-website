@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowknightLauncher</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-image: url("1.gif");
+            background-size: cover; 
+            background-repeat: no-repeat;
+            background-position: center; 
+            background-color: transparent; 
+            overflow: hidden; 
+        }
+
+        .sidepanel {
+            background-color: black; 
+            width: 200px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10; 
+        }
+
+        .button-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%; 
+        }
+
+        .button {
+            background-color: transparent; 
+            color: white;
+            border: none;
+            padding: 20px 30px; 
+            border-radius: 10px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative; 
+            width: 100%; 
+            text-align: left; 
+            font-size: 1.2rem; 
+            text-shadow: 2px 2px 4px black; 
+        }
+
+        .button:hover {
+            background-color: rgba(255, 255, 255, 0.1); 
+        }
+
+        .button-image {
+            position: relative; 
+            left: 0; 
+            top: 36%;
+            transform: translateY(-50%); 
+            width: 30px;
+            height: 30px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            z-index: 5; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .footer {
+            background-color: rgba(0, 0, 0, 0.8); 
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 10; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer button {
+            background-color: rgba(0, 0, 0, 0.6); 
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .footer button:hover {
+            background-color: rgba(0, 0, 0, 0.4); 
+        }
+
+        .shadowknight {
+            font-size: 2rem; 
+            color: yellow; 
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .sidepanel .button-container:first-child {
+            margin-bottom: 20px; 
+        }
+
+        .sidepanel .button-container:last-child {
+            margin-top: 60px; 
+        }
+
+        .sidepanel .button-container:nth-child(2),
+        .sidepanel .button-container:nth-child(3) {
+            margin-top: 5px; 
+        }
+
+        .sidepanel .button-container:last-child .button {
+            background-color: rgba(0, 0, 0, 0.5); 
+        }
+
+        .footer .shadowknight-date {
+            font-size: 1rem; 
+            color: white;
+            margin-left: 20px;
+        }
+
+        .proxy-button {
+            background-color: transparent; 
+            color: white;
+            border: none;
+            padding: 20px 30px; 
+            border-radius: 10px; 
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative; 
+            width: 100%; 
+            text-align: left; 
+            font-size: 1.2rem; 
+            text-shadow: 2px 2px 4px black; 
+        }
+
+        .proxy-button:hover {
+            background-color: rgba(255, 255, 255, 0.1); 
+        }
+
+        .proxy-button-image {
+            position: relative; 
+            left: 0; 
+            top: 30%;
+            transform: translateY(-50%); 
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidepanel">
+        <div class="button-container">
+            <img src="discord.png" class="button-image">
+            <button class="button" onclick="window.location.href='discord.html'">Discord</button>
+        </div>
+        <div class="button-container">
+            <img src="eaglerclients.png" class="button-image">
+            <button class="button" onclick="window.location.href='eaglerclients.html'">Eagler Clients</button>
+        </div>
+        <div class="button-container">
+            <img src="eaglercraftservers.png" class="button-image">
+            <button class="button" onclick="window.location.href='eaglercraftservers.html'">Eaglercraft Servers</button>
+        </div>
+        <div class="button-container">
+            <img src="boss-fight.png" class="button-image">
+            <button class="button" onclick="window.location.href='boss-fight.html'">Boss Fight</button>
+        </div>
+        <div class="button-container">
+            <img src="proxy.png" class="proxy-button-image">
+            <button class="proxy-button" onclick="window.open('https://proxy.shadowknight.cc', '_blank')">Proxy</button>
+        </div>
+    </div>
+    <div class="content">
+        <h1>Shadowknight Launcher</h1>
+        <p>Welcome to the Shadowknight Launcher click button on the side to get started!</p>
+    </div>
+    <div class="footer">
+        <span class="shadowknight-date">CopyRight 2024-2023</span>
+        <button onclick="changeBackground('1.gif')">Background 1</button>
+        <button onclick="changeBackground('2.gif')">Background 2</button>
+        <button onclick="changeBackground('3.gif')">Background 3</button>
+        <button onclick="changeBackground('4.gif')">Background 4</button>
+    </div>
+
+    <script>
+        function changeBackground(image) {
+            document.body.style.backgroundImage = `url(${image})`;
+        }
+    </script>
+</body>
+</html>
