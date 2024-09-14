@@ -210,5 +210,19 @@
             document.body.style.backgroundImage = `url(${image})`;
         }
     </script>
+    
+    <audio id="hoverSound" src="hover-sound.mp3" preload="auto"></audio> 
+    
+    <script>
+        const buttons = document.querySelectorAll('label');
+        const hoverSound = document.getElementById('hoverSound');
+    
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                hoverSound.currentTime = 0; // Rewind to start if the sound is already playing
+                hoverSound.play();
+            });
+        });
+    </script>
 </body>
 </html>
