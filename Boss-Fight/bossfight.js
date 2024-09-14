@@ -1,137 +1,150 @@
-// Basic Three.js setup
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas') });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Pointer Lock controls
-let isPointerLocked = false;
-document.body.addEventListener('click', () => {
-    document.body.requestPointerLock();
-});
-
-document.addEventListener('pointerlockchange', () => {
-    isPointerLocked = !!document.pointerLockElement;
-});
-
-// Mouse movement for camera rotation
-let rotation = { x: 0, y: 0 };
-document.addEventListener('mousemove', (event) => {
-    if (isPointerLocked) {
-        const sensitivity = 0.002; // Control how sensitive the camera is to mouse movements
-        rotation.x -= event.movementX * sensitivity;
-        rotation.y -= event.movementY * sensitivity;
-
-        rotation.y = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotation.y)); // Prevent flipping the camera upside down
-    }
-});
-
-// First person controls setup
-let controls = {
-    moveForward: false,
-    moveBackward: false,
-    moveLeft: false,
-    moveRight: false
-};
-
-// Adding ground
-const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
-const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x555555 });
-const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-ground.rotation.x = -Math.PI / 2;
-scene.add(ground);
-
-// Lighting
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(0, 100, 100).normalize();
-scene.add(light);
-
-// Rain particles
-const rainCount = 5000;
-const rainGeometry = new THREE.BufferGeometry();
-const rainPositions = new Float32Array(rainCount * 3);
-
-for (let i = 0; i < rainCount * 3; i++) {
-    rainPositions[i] = Math.random() * 1000 - 500;
-}
-
-rainGeometry.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
-
-const rainMaterial = new THREE.PointsMaterial({ color: 0xaaaaaa, size: 0.1 });
-const rainParticles = new THREE.Points(rainGeometry, rainMaterial);
-scene.add(rainParticles);
-
-// Movement speed and direction
-const playerSpeed = 0.1;
+let camera, scene, renderer, controls;
+let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+let canJump = false;
+let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
+let prevTime = performance.now();
 
-// Player controls
-function handleKeyDown(event) {
+init();
+animate();
+
+function init() {
+    // Scene setup
+    scene = new THREE.Scene();
+
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Plane setup
+    const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
+    const planeMaterial = new THREE.MeshBasicMaterial({color: 'green'});
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = -Math.PI / 2;  // Rotate to be flat on the ground
+    scene.add(plane);
+
+    // Lighting setup
+    const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+    scene.add(ambientLight);
+
+    // Pointer Lock API
+    const instructions = document.getElementById('instructions');
+    const blocker = document.getElementById('blocker');
+
+    instructions.addEventListener('click', function () {
+        document.body.requestPointerLock();
+    }, false);
+
+    document.addEventListener('pointerlockchange', function () {
+        if (document.pointerLockElement === document.body) {
+            instructions.style.display = 'none';
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        } else {
+            instructions.style.display = '';
+            document.removeEventListener('keydown', onKeyDown);
+            document.removeEventListener('keyup', onKeyUp);
+        }
+    }, false);
+
+    // First-person controls
+    const onMouseMove = function (event) {
+        const movementX = event.movementX || 0;
+        const movementY = event.movementY || 0;
+
+        camera.rotation.y -= movementX * 0.002;
+        camera.rotation.x -= movementY * 0.002;
+        camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));  // Clamp vertical look
+    };
+
+    document.addEventListener('mousemove', onMouseMove, false);
+
+    window.addEventListener('resize', onWindowResize, false);
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function onKeyDown(event) {
     switch (event.code) {
+        case 'ArrowUp':
         case 'KeyW':
-            controls.moveForward = true;
+            moveForward = true;
             break;
-        case 'KeyS':
-            controls.moveBackward = true;
-            break;
+        case 'ArrowLeft':
         case 'KeyA':
-            controls.moveLeft = true;
+            moveLeft = true;
             break;
+        case 'ArrowDown':
+        case 'KeyS':
+            moveBackward = true;
+            break;
+        case 'ArrowRight':
         case 'KeyD':
-            controls.moveRight = true;
+            moveRight = true;
+            break;
+        case 'Space':
+            if (canJump) velocity.y += 350;
+            canJump = false;
             break;
     }
 }
 
-function handleKeyUp(event) {
+function onKeyUp(event) {
     switch (event.code) {
+        case 'ArrowUp':
         case 'KeyW':
-            controls.moveForward = false;
+            moveForward = false;
             break;
-        case 'KeyS':
-            controls.moveBackward = false;
-            break;
+        case 'ArrowLeft':
         case 'KeyA':
-            controls.moveLeft = false;
+            moveLeft = false;
             break;
+        case 'ArrowDown':
+        case 'KeyS':
+            moveBackward = false;
+            break;
+        case 'ArrowRight':
         case 'KeyD':
-            controls.moveRight = false;
+            moveRight = false;
             break;
     }
 }
 
-document.addEventListener('keydown', handleKeyDown);
-document.addEventListener('keyup', handleKeyUp);
-
-// Main game loop
 function animate() {
     requestAnimationFrame(animate);
 
-    // Camera rotation logic
-    camera.rotation.y = rotation.x;
-    camera.rotation.x = rotation.y;
+    const time = performance.now();
+    const delta = (time - prevTime) / 1000;
 
-    // Movement logic
-    direction.set(0, 0, 0);
-    if (controls.moveForward) direction.z -= playerSpeed;
-    if (controls.moveBackward) direction.z += playerSpeed;
-    if (controls.moveLeft) direction.x -= playerSpeed;
-    if (controls.moveRight) direction.x += playerSpeed;
+    velocity.x -= velocity.x * 10.0 * delta;
+    velocity.z -= velocity.z * 10.0 * delta;
+    velocity.y -= 9.8 * 100.0 * delta; // gravity
 
-    camera.translateX(direction.x);
-    camera.translateZ(direction.z);
+    direction.z = Number(moveForward) - Number(moveBackward);
+    direction.x = Number(moveRight) - Number(moveLeft);
+    direction.normalize(); // Ensures consistent movement in all directions
 
-    // Rain effect movement
-    rainParticles.position.y -= 0.2;
-    if (rainParticles.position.y < -50) {
-        rainParticles.position.y = 50;
+    if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+    if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+
+    camera.position.x += velocity.x * delta;
+    camera.position.z += velocity.z * delta;
+    camera.position.y += velocity.y * delta;
+
+    if (camera.position.y < 10) {
+        velocity.y = 0;
+        camera.position.y = 10;
+        canJump = true;
     }
 
     renderer.render(scene, camera);
+    prevTime = time;
 }
-
-camera.position.y = 1.6;  // Set camera height to simulate player height
-camera.position.z = 5;    // Initial position
-
-animate();
