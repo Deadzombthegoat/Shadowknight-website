@@ -1,43 +1,61 @@
-// Set up the scene, camera, and renderer
+// Initialize scene, camera, and renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Create a geometry with 100 randomly positioned vertices
-const geometry = new THREE.Geometry();
-for (let i = 0; i < 100; i++) {
-  const vertex = new THREE.Vector3();
-  vertex.x = Math.random() * 20 - 10;
-  vertex.y = Math.random() * 20 - 10;
-  vertex.z = Math.random() * 20 - 10;
-  geometry.vertices.push(vertex);
-}
+// Set background color
+scene.background = new THREE.Color(0x0000ff); // Blue background
 
-// Create a points material and set its size
-const material = new THREE.PointsMaterial({ size: 0.5 });
+// Create a green plane
+const geometry = new THREE.PlaneGeometry(100, 100);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const plane = new THREE.Mesh(geometry, material);
+plane.rotation.x = -Math.PI / 2; // Rotate the plane to be horizontal
+scene.add(plane);
 
-// Create a points object and add it to the scene
-const points = new THREE.Points(geometry, material);
-scene.add(points);
+// Set camera position
+camera.position.set(0, 10, 0);
+camera.lookAt(0, 0, 0);
 
-// Animate the points by updating their positions each frame
+// Handle pointer lock and movement
+let controlsEnabled = false;
+document.addEventListener('click', () => {
+    if (!controlsEnabled) {
+        document.body.requestPointerLock();
+        controlsEnabled = true;
+    }
+});
+
+const movementSpeed = 0.1;
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case 'w':
+            camera.position.z -= movementSpeed;
+            break;
+        case 's':
+            camera.position.z += movementSpeed;
+            break;
+        case 'a':
+            camera.position.x -= movementSpeed;
+            break;
+        case 'd':
+            camera.position.x += movementSpeed;
+            break;
+    }
+});
+
+// Update loop
 function animate() {
-  requestAnimationFrame(animate);
-
-  // Update the position of each vertex
-  for (let i = 0; i < 100; i++) {
-    const vertex = geometry.vertices[i];
-    vertex.x += Math.random() * 0.1 - 0.05;
-    vertex.y += Math.random() * 0.1 - 0.05;
-    vertex.z += Math.random() * 0.1 - 0.05;
-  }
-
-  // Tell three.js that the geometry has changed and needs to be re-rendered
-  geometry.verticesNeedUpdate = true;
-
-  renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
 }
-
 animate();
+
+// Handle window resizing
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
