@@ -43,7 +43,7 @@
             padding: 20px 30px; 
             border-radius: 10px; 
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s ease;
+            transition: background-color 0.3s;
             position: relative; 
             width: 100%; 
             text-align: left; 
@@ -147,7 +147,7 @@
             padding: 20px 30px; 
             border-radius: 10px; 
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s ease;
+            transition: background-color 0.3s;
             position: relative; 
             width: 100%; 
             text-align: left; 
@@ -157,7 +157,6 @@
 
         .proxy-button:hover {
             background-color: rgba(255, 255, 255, 0.1); 
-            transform: scale(1.1);
         }
 
         .proxy-button-image {
@@ -215,7 +214,7 @@
     <audio id="hoverSound" src="hover-sound.mp3" preload="auto"></audio> 
     
     <script>
-        const buttons = document.querySelectorAll('.button, .proxy-button'); // Select buttons for hover sound
+        const buttons = document.querySelectorAll('.button'); // select all buttons
         const hoverSound = document.getElementById('hoverSound');
     
         buttons.forEach(button => {
