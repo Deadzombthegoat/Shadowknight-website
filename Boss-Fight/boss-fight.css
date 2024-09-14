@@ -1,9 +1,18 @@
 body {
     margin: 0;
     overflow: hidden;
-    cursor: none; /* Hide the cursor for a more immersive experience */
+    background-color: grey;
 }
 
-canvas {
-    display: block;
+#instructions {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    user-select: none;
 }
