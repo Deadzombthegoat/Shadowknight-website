@@ -10,7 +10,7 @@
             font-family: sans-serif;
             margin: 0;
             display: flex;
-            height: 20vh;
+            height: 100vh;
             background-image: url("1.gif");
             background-size: cover; 
             background-repeat: no-repeat;
@@ -25,10 +25,8 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* This will evenly distribute the buttons */
             gap: 20px;
-            z-index: 10;
-            height: 100vh; /* Ensure the side panel takes up the full height */
+            z-index: 10; 
         }
 
         .button-container {
@@ -69,6 +67,22 @@
             transition: transform 0.3s ease;
         }
 
+        .content {
+            flex: 1;
+            padding: 20px;
+            z-index: 5; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }
+
         .footer {
             background-color: rgba(0, 0, 0, 0.8); 
             text-align: center;
@@ -101,6 +115,29 @@
             font-size: 2rem; 
             color: yellow; 
             text-shadow: 2px 2px 4px black;
+        }
+
+        .sidepanel .button-container:first-child {
+            margin-bottom: 20px; 
+        }
+
+        .sidepanel .button-container:last-child {
+            margin-top: 60px; 
+        }
+
+        .sidepanel .button-container:nth-child(2),
+        .sidepanel .button-container:nth-child(3) {
+            margin-top: 5px; 
+        }
+
+        .sidepanel .button-container:last-child .button {
+            background-color: rgba(0, 0, 0, 0.5); 
+        }
+
+        .footer .shadowknight-date {
+            font-size: 1rem; 
+            color: white;
+            margin-left: 20px;
         }
 
         .proxy-button {
@@ -156,6 +193,10 @@
             <button class="proxy-button" onclick="window.open('https://proxy.shadowknight.cc', '_blank')">Proxy</button>
         </div>
     </div>
+    <div class="content">
+        <h1>Shadowknight Launcher</h1>
+        <p>Welcome to the Shadowknight Launcher click button on the side to get started!</p>
+    </div>
     <div class="footer">
         <span class="shadowknight-date">ShadowKnight© 2024</span>
         <button onclick="changeBackground('1.gif')">Background 1</button>
@@ -170,11 +211,10 @@
         }
     </script>
     
-    <!-- Preload the hover sound -->
     <audio id="hoverSound" src="hover-sound.mp3" preload="auto"></audio> 
-
+    
     <script>
-        const buttons = document.querySelectorAll('.button, .proxy-button');
+        const buttons = document.querySelectorAll('.button'); // select all buttons
         const hoverSound = document.getElementById('hoverSound');
     
         buttons.forEach(button => {
@@ -182,11 +222,6 @@
                 hoverSound.currentTime = 0; // Rewind to start if the sound is already playing
                 hoverSound.play();
             });
-        });
-
-        // Automatically play the sound when the user interacts with the page
-        document.body.addEventListener('click', () => {
-            hoverSound.play();
         });
     </script>
 </body>
