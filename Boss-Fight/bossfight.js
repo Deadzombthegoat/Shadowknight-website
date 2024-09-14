@@ -1,28 +1,43 @@
-// Basic scene setup
+// Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Add a basic cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// Create a geometry with 100 randomly positioned vertices
+const geometry = new THREE.Geometry();
+for (let i = 0; i < 100; i++) {
+  const vertex = new THREE.Vector3();
+  vertex.x = Math.random() * 20 - 10;
+  vertex.y = Math.random() * 20 - 10;
+  vertex.z = Math.random() * 20 - 10;
+  geometry.vertices.push(vertex);
+}
 
-// Set up camera position
-camera.position.z = 5;
+// Create a points material and set its size
+const material = new THREE.PointsMaterial({ size: 0.5 });
 
-// Basic render loop
+// Create a points object and add it to the scene
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+
+// Animate the points by updating their positions each frame
 function animate() {
-    requestAnimationFrame(animate);
-    
-    // Rotate cube for some simple animation
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+
+  // Update the position of each vertex
+  for (let i = 0; i < 100; i++) {
+    const vertex = geometry.vertices[i];
+    vertex.x += Math.random() * 0.1 - 0.05;
+    vertex.y += Math.random() * 0.1 - 0.05;
+    vertex.z += Math.random() * 0.1 - 0.05;
+  }
+
+  // Tell three.js that the geometry has changed and needs to be re-rendered
+  geometry.verticesNeedUpdate = true;
+
+  renderer.render(scene, camera);
 }
 
 animate();
